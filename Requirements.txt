@@ -1,0 +1,2 @@
+Requirements:
+pyserial (cmd prompt --> pip install pyserial)
