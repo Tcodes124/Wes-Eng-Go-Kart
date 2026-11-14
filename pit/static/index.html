@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pit Wall</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">PIT WALL</div>
+    <div class="link" id="link"><span class="dot"></span><span id="link-text">Connecting…</span></div>
+    <div class="link-stats" id="link-stats"></div>
+    <div class="spacer"></div>
+    <span class="source" id="source"></span>
+    <button id="theme-toggle" class="ghost" type="button">Sun mode</button>
+  </header>
+
+  <div id="alerts" class="alerts" aria-live="polite"></div>
+
+  <main class="grid">
+    <section class="card live">
+      <h2>Lap <span id="lap">–</span></h2>
+      <div class="lap-time" id="current-lap">–</div>
+      <div class="stats3">
+        <div><label>Last</label><span id="last-lap">–</span></div>
+        <div><label>Best</label><span id="best-lap">–</span></div>
+        <div><label>Speed</label><span id="speed">–</span><small> km/h</small></div>
+      </div>
+    </section>
+
+    <section class="card battery">
+      <h2>Battery</h2>
+      <div class="charge-row">
+        <div class="charge" id="charge">–</div>
+        <div class="stats-col">
+          <div><label>Voltage</label><span id="volts">–</span></div>
+          <div><label>Current</label><span id="amps">–</span></div>
+          <div><label>Power</label><span id="power">–</span></div>
+        </div>
+      </div>
+      <div class="bar"><div class="fill" id="charge-bar"></div></div>
+      <div class="temps" id="temps"></div>
+    </section>
+
+    <section class="card strategy">
+      <h2>Energy strategy</h2>
+      <div class="verdict" id="verdict">Waiting for data</div>
+      <div class="verdict-sub" id="verdict-sub"></div>
+      <div class="stats2">
+        <div><label>Energy per lap</label><span id="wh-lap">–</span></div>
+        <div><label>Laps the battery can do</label><span id="laps-possible">–</span></div>
+        <div><label>Laps left in race</label><span id="laps-left">–</span></div>
+        <div><label>Battery used per lap</label><span id="pct-lap">–</span></div>
+      </div>
+      <div class="inputs">
+        <label>Race laps <input id="race-laps" type="number" min="1" max="999"></label>
+        <label>Pack size (Wh) <input id="pack-wh" type="number" min="1" step="10"></label>
+      </div>
+    </section>
+
+    <section class="card map">
+      <h2>Track <span class="hint" id="map-hint">colored by speed</span></h2>
+      <canvas id="track"></canvas>
+      <div class="legend"><span id="legend-min">slow</span><span class="scale"></span><span id="legend-max">fast</span></div>
+    </section>
+
+    <section class="card gforce">
+      <h2>G-force</h2>
+      <canvas id="gg"></canvas>
+      <div class="stats2 tight">
+        <div><label>Cornering</label><span id="lat-g">–</span></div>
+        <div><label>Brake / accel</label><span id="long-g">–</span></div>
+      </div>
+    </section>
+
+    <section class="card messages">
+      <h2>Message the driver</h2>
+      <div class="msg-buttons" id="msg-buttons"></div>
+      <div class="msg-status" id="msg-status">No message sent yet</div>
+    </section>
+
+    <section class="card laps">
+      <h2>Laps</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Lap</th><th>Time</th><th>Gap to best</th><th>Energy</th><th>Battery used</th><th>Top speed</th></tr>
+          </thead>
+          <tbody id="lap-rows"><tr><td colspan="6" class="muted">No laps yet</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

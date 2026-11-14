@@ -1,0 +1,12 @@
+{
+  "_note": "Starting values only. Replace with real numbers from our pack and datasheets (architecture.md section 11). race_laps and pack_capacity_wh can also be changed live from the dashboard.",
+  "race_laps": 25,
+  "pack_capacity_wh": 880,
+  "batt_temp_max_c": 50,
+  "motor_temp_max_c": 70,
+  "ctrl_temp_max_c": 65,
+  "temp_warn_margin_c": 5,
+  "min_pack_v": 42.0,
+  "link_timeout_s": 3,
+  "max_packet_loss_pct": 20
+}
