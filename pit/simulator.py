@@ -94,8 +94,14 @@ class KartSimulator:
         self.rng = random.Random(seed)
         self.track = Track(accel=self.ACCEL, brake=self.BRAKE)
         self.lock = threading.Lock()
+        self.seq = 0
+        self.msg_id = 0
+        self._new_session()
 
+    def _new_session(self):
+        """Fully charged kart at the start line, as if it was just switched on."""
         self.t = 0.0
+        self.flat_since = None
         self.dist = 0.0
         self.speed = 0.0
         self.lap = 1
@@ -112,9 +118,7 @@ class KartSimulator:
         self.pace_effect = 1.0
         self.max_lat = 0.0
         self.max_long = 0.0
-        self.seq = 0
 
-        self.msg_id = 0
         self.msg_code = 0
         self.msg_ack = False
         self.ack_due = None
@@ -181,6 +185,14 @@ class KartSimulator:
                 effect = self.PACE_EFFECT.get(self.msg_code, None)
                 if effect is not None:
                     self.pace_effect = effect
+
+            # Flat battery: sit for 10 s, then start a new session on a full charge.
+            # The kart's uptime resets, which tells the pit a new session began.
+            if self.soc <= 0 and self.speed == 0:
+                if self.flat_since is None:
+                    self.flat_since = self.t
+                elif self.t - self.flat_since > 10:
+                    self._new_session()
 
     def lap_fraction(self):
         with self.lock:

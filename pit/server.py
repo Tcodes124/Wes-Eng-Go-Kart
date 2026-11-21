@@ -76,6 +76,7 @@ class PitState:
         self.prev_uptime = None
         self.prev_lap = None
 
+        self.session = 1
         self.laps = []
         self.trail = deque(maxlen=TRAIL_MAX)
         self.lap_wh = 0.0
@@ -101,11 +102,9 @@ class PitState:
     def on_packet(self, t):
         now = time.monotonic()
         with self.lock:
-            # Kart rebooted (uptime went backwards): start lap tracking over.
+            # Kart was switched off and on (uptime went backwards): new session.
             if self.prev_uptime is not None and t.uptime_ms < self.prev_uptime:
-                self.prev_seq = self.prev_lap = None
-                self.lap_has_full_data = False
-                self.lap_wh = 0.0
+                self._new_session()
 
             if self.prev_seq is not None:
                 gap = (t.seq - self.prev_seq) & 0xFFFF
@@ -142,6 +141,18 @@ class PitState:
         snap["point"] = point
         snap["new_packet"] = True
         self.publish("update", snap)
+
+    def _new_session(self):
+        """Clear laps, the track trail and messages. The CSV log keeps everything."""
+        self.session += 1
+        self.laps = []
+        self.trail.clear()
+        self.prev_seq = self.prev_lap = None
+        self.lap_wh = 0.0
+        self.lap_max_speed = 0.0
+        self.lap_start_charge = None
+        self.lap_has_full_data = False
+        self.message = None
 
     def _finish_lap(self, t):
         charge_used = None
@@ -262,6 +273,7 @@ class PitState:
         rate = len([x for x in self.rx_times if now - x <= 5]) / 5
         strategy = self._strategy()
         snap = {
+            "session": self.session,
             "source": self.source_name,
             "source_status": self.source_status,
             "since_last_rx_s": since_rx,

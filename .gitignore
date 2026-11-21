@@ -1,3 +1,4 @@
 __pycache__/
 pit/logs/
 .DS_Store
+.claude/

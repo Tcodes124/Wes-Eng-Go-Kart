@@ -71,6 +71,18 @@ class SimulatorTests(unittest.TestCase):
         self.assertGreater(t.last_lap_ms, 30000)
         self.assertLess(t.charge_pct, 100)
 
+    def test_flat_battery_starts_new_session(self):
+        sim = KartSimulator(seed=4)
+        for _ in range(int(60 / 0.02)):
+            sim.step(0.02)
+        sim.soc = 0.0  # pretend the battery just ran out
+        for _ in range(int(30 / 0.02)):  # coast to a stop, wait 10 s, restart
+            sim.step(0.02)
+        t = sim.make_telemetry()
+        self.assertGreaterEqual(t.charge_pct, 98)  # full again, minus a few seconds of driving
+        self.assertEqual(t.lap, 1)
+        self.assertLess(t.uptime_ms, 30000)
+
     def test_driver_acknowledges_message(self):
         sim = KartSimulator(seed=2)
         sim.receive(tl.encode_driver_message(5, 2))

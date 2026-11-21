@@ -7,85 +7,111 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">PIT WALL</div>
-    <div class="link" id="link"><span class="dot"></span><span id="link-text">Connecting…</span></div>
+  <header class="topbar" id="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Pit Wall</span>
+      <span class="session" id="session"></span>
+      <span class="chip chip-frozen" id="frozen-chip" hidden>Display frozen</span>
+    </div>
+    <div class="link-pill" id="link"><span class="dot" aria-hidden="true"></span><span id="link-text">Connecting…</span></div>
+    <span class="sr-only" id="link-announce" role="status" aria-atomic="true"></span>
     <div class="link-stats" id="link-stats"></div>
     <div class="spacer"></div>
     <span class="source" id="source"></span>
-    <button id="theme-toggle" class="ghost" type="button">Sun mode</button>
+    <button id="freeze" class="tool" type="button" aria-pressed="false"></button>
+    <button id="theme-toggle" class="tool" type="button"></button>
   </header>
 
-  <div id="alerts" class="alerts" aria-live="polite"></div>
+  <div class="alert-strip" id="alerts" role="status" aria-live="polite"></div>
 
   <main class="grid">
-    <section class="card live">
-      <h2>Lap <span id="lap">–</span></h2>
-      <div class="lap-time" id="current-lap">–</div>
-      <div class="stats3">
-        <div><label>Last</label><span id="last-lap">–</span></div>
-        <div><label>Best</label><span id="best-lap">–</span></div>
-        <div><label>Speed</label><span id="speed">–</span><small> km/h</small></div>
+    <section class="card timing" aria-labelledby="h-timing">
+      <div class="card-head">
+        <h2 id="h-timing">Lap</h2>
+        <span class="lap-num" id="lap">–</span>
       </div>
+      <div class="hero-num" id="current-lap">–</div>
+      <dl class="stats3">
+        <div><dt>Last</dt><dd id="last-lap">–</dd></div>
+        <div><dt>Best</dt><dd id="best-lap" class="best-text">–</dd></div>
+        <div><dt>Speed</dt><dd><span id="speed">–</span> <small>km/h</small></dd></div>
+      </dl>
     </section>
 
-    <section class="card battery">
-      <h2>Battery</h2>
-      <div class="charge-row">
-        <div class="charge" id="charge">–</div>
-        <div class="stats-col">
-          <div><label>Voltage</label><span id="volts">–</span></div>
-          <div><label>Current</label><span id="amps">–</span></div>
-          <div><label>Power</label><span id="power">–</span></div>
-        </div>
+    <section class="card battery" aria-labelledby="h-battery">
+      <div class="card-head">
+        <h2 id="h-battery">Battery</h2>
+        <span class="chip" id="charge-state"></span>
       </div>
-      <div class="bar"><div class="fill" id="charge-bar"></div></div>
+      <div class="charge-row">
+        <div class="hero-num" id="charge">–</div>
+        <dl class="stats-col">
+          <div><dt>Voltage</dt><dd id="volts">–</dd></div>
+          <div><dt>Current</dt><dd id="amps">–</dd></div>
+          <div><dt>Power</dt><dd id="power">–</dd></div>
+        </dl>
+      </div>
+      <div class="meter" aria-hidden="true"><div class="meter-fill" id="charge-bar"></div></div>
       <div class="temps" id="temps"></div>
     </section>
 
-    <section class="card strategy">
-      <h2>Energy strategy</h2>
-      <div class="verdict" id="verdict">Waiting for data</div>
-      <div class="verdict-sub" id="verdict-sub"></div>
-      <div class="stats2">
-        <div><label>Energy per lap</label><span id="wh-lap">–</span></div>
-        <div><label>Laps the battery can do</label><span id="laps-possible">–</span></div>
-        <div><label>Laps left in race</label><span id="laps-left">–</span></div>
-        <div><label>Battery used per lap</label><span id="pct-lap">–</span></div>
-      </div>
+    <section class="card strategy" aria-labelledby="h-strategy">
+      <div class="card-head"><h2 id="h-strategy">Energy strategy</h2></div>
+      <div class="verdict" id="verdict"><span id="verdict-icon"></span><span id="verdict-text">Collecting data</span></div>
+      <p class="verdict-sub" id="verdict-sub">Needs one full lap to estimate energy use</p>
+      <dl class="stats2">
+        <div><dt>Energy per lap</dt><dd id="wh-lap">–</dd></div>
+        <div><dt>Battery per lap</dt><dd id="pct-lap">–</dd></div>
+        <div><dt>Laps battery can do</dt><dd id="laps-possible">–</dd></div>
+        <div><dt>Laps left in race</dt><dd id="laps-left">–</dd></div>
+      </dl>
       <div class="inputs">
-        <label>Race laps <input id="race-laps" type="number" min="1" max="999"></label>
-        <label>Pack size (Wh) <input id="pack-wh" type="number" min="1" step="10"></label>
+        <label for="race-laps">Race laps<input id="race-laps" type="number" min="1" max="999" inputmode="numeric"></label>
+        <label for="pack-wh">Pack size (Wh)<input id="pack-wh" type="number" min="1" step="10" inputmode="numeric"></label>
       </div>
     </section>
 
-    <section class="card map">
-      <h2>Track <span class="hint" id="map-hint">colored by speed</span></h2>
-      <canvas id="track"></canvas>
-      <div class="legend"><span id="legend-min">slow</span><span class="scale"></span><span id="legend-max">fast</span></div>
-    </section>
-
-    <section class="card gforce">
-      <h2>G-force</h2>
-      <canvas id="gg"></canvas>
-      <div class="stats2 tight">
-        <div><label>Cornering</label><span id="lat-g">–</span></div>
-        <div><label>Brake / accel</label><span id="long-g">–</span></div>
+    <section class="card map" aria-labelledby="h-map">
+      <div class="card-head">
+        <h2 id="h-map">Track</h2>
+        <div class="legend" aria-label="Speed color scale">
+          <span id="legend-min">slow</span><span class="scale" aria-hidden="true"></span><span id="legend-max">fast</span>
+        </div>
       </div>
+      <canvas id="track" role="img" aria-label="Map of the kart's GPS trail, colored by speed"></canvas>
     </section>
 
-    <section class="card messages">
-      <h2>Message the driver</h2>
-      <div class="msg-buttons" id="msg-buttons"></div>
-      <div class="msg-status" id="msg-status">No message sent yet</div>
+    <section class="card gforce" aria-labelledby="h-gforce">
+      <div class="card-head"><h2 id="h-gforce">G-force</h2></div>
+      <canvas id="gg" role="img" aria-label="Recent peak cornering and braking G"></canvas>
+      <dl class="stats2 tight">
+        <div><dt>Cornering</dt><dd id="lat-g">–</dd></div>
+        <div><dt>Brake / accel</dt><dd id="long-g">–</dd></div>
+      </dl>
     </section>
 
-    <section class="card laps">
-      <h2>Laps</h2>
+    <section class="card messages" aria-labelledby="h-messages">
+      <div class="card-head"><h2 id="h-messages">Message the driver</h2></div>
+      <div class="msg-primary" id="msg-primary"></div>
+      <div class="msg-sector">
+        <span class="field-label" id="sector-label">Losing time in sector</span>
+        <div class="segmented" id="msg-sector" role="group" aria-labelledby="sector-label"></div>
+      </div>
+      <ol class="msg-steps" id="msg-steps" aria-label="Message progress">
+        <li data-step="0">Sent</li>
+        <li data-step="1">On screen</li>
+        <li data-step="2">Driver OK</li>
+      </ol>
+      <p class="msg-status" id="msg-status">No message sent yet</p>
+    </section>
+
+    <section class="card laps" aria-labelledby="h-laps">
+      <div class="card-head"><h2 id="h-laps">Laps</h2></div>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Lap</th><th>Time</th><th>Gap to best</th><th>Energy</th><th>Battery used</th><th>Top speed</th></tr>
+            <tr><th scope="col">Lap</th><th scope="col">Time</th><th scope="col">Gap to best</th><th scope="col">Energy</th><th scope="col">Battery used</th><th scope="col">Top speed</th></tr>
           </thead>
           <tbody id="lap-rows"><tr><td colspan="6" class="muted">No laps yet</td></tr></tbody>
         </table>
